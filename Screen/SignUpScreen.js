@@ -1,37 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Animated,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import LottieView from 'lottie-react-native';
+import User from '../Screen/LottiView/user.json';
+import doctor from '../Screen/LottiView/doctor.json';
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(''); // Selected role
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false); // Dropdown visibility
-
-  const roles = ["Admin", "Doctor", "User"]; // Role options
-
-  const handleSelectRole = (selectedRole) => {
-    setRole(selectedRole);
-    setShowRoleDropdown(false);
-  };
+  const [role, setRole] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [scale, setScale] = useState(new Animated.Value(1));
 
   // Validation function
   const validateForm = () => {
     if (!name.trim()) {
-      Alert.alert("Validation Error", "Please enter your name.");
+      Alert.alert('Validation Error', 'Please enter your name.');
       return false;
     }
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert("Validation Error", "Please enter a valid email address.");
+      Alert.alert('Validation Error', 'Please enter a valid email address.');
       return false;
     }
     if (!password.trim() || password.length < 6) {
-      Alert.alert("Validation Error", "Password must be at least 6 characters long.");
+      Alert.alert(
+        'Validation Error',
+        'Password must be at least 6 characters long.',
+      );
       return false;
     }
     if (!role) {
-      Alert.alert("Validation Error", "Please select a role.");
+      Alert.alert('Validation Error', 'Please select a role.');
       return false;
     }
     return true;
@@ -40,19 +48,83 @@ const SignUpScreen = ({ navigation }) => {
   // Handle submit
   const handleSubmit = () => {
     if (validateForm()) {
-      Alert.alert("Success", "You have successfully signed up!");
+      console.log('Name:', name);
+      console.log('Role:', role);
+      console.log('Email:', email);
+      console.log('Password:', password);
+      Alert.alert('Success', 'You have successfully signed up!');
       // Perform sign-up actions (e.g., API call)
     }
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color="#4F4F4F" />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
+          <Icon name="arrow-back" size={26} color="#4F4F4F" />
         </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
+      </View>
+
+      {/* Role Selection */}
+      <Text style={styles.HeaderTitle}>Choose Account Role</Text>
+
+      <View style={styles.roleButtonsContainer}>
+        {/* User Button with Animation */}
+        <Animated.View
+          style={[
+            styles.roleButton,
+            role === 'User' && styles.selectedRole,
+            {transform: [{scale}]},
+          ]}>
+          <TouchableOpacity
+            style={styles.buttonInner}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={() => setRole('User')}>
+            <LottieView
+              source={doctor}
+              autoPlay
+              loop
+              style={styles.lottieIcon}
+            />
+            <Text style={styles.roleButtonText}>User</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Doctor Button with Animation */}
+        <Animated.View
+          style={[
+            styles.roleButton,
+            role === 'Doctor' && styles.selectedRole,
+            {transform: [{scale}]},
+          ]}>
+          <TouchableOpacity
+            style={styles.buttonInner}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={() => setRole('Doctor')}>
+            <LottieView source={User} autoPlay loop style={styles.lottieIcon} />
+            <Text style={styles.roleButtonText}>Doctor</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       {/* Name Input */}
@@ -86,32 +158,20 @@ const SignUpScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Enter your password"
-          secureTextEntry
+          secureTextEntry={!passwordVisible}
           value={password}
           placeholderTextColor="#A9A9A9"
           onChangeText={setPassword}
         />
-        <Icon name="visibility-off" size={20} color="#A9A9A9" style={styles.iconRight} />
-      </View>
-
-      {/* Role Dropdown */}
-      <View style={styles.inputContaine}>
-        <Icon name="work" size={20} color="#A9A9A9" style={styles.icon} />
-        <TouchableOpacity style={styles.dropdown} onPress={() => setShowRoleDropdown(!showRoleDropdown)}>
-          <Text style={styles.input}>{role || "Select your role"}</Text>
-          <Icon name={showRoleDropdown ? "arrow-drop-up" : "arrow-drop-down"} size={20} color="#A9A9A9" />
+        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+          <Icon
+            name={passwordVisible ? 'visibility' : 'visibility-off'}
+            size={20}
+            color="#A9A9A9"
+            style={styles.iconRight}
+          />
         </TouchableOpacity>
       </View>
-
-      {showRoleDropdown && (
-        <View style={styles.dropdownContainer}>
-          {roles.map((item, index) => (
-            <TouchableOpacity key={index} onPress={() => handleSelectRole(item)} style={styles.dropdownItem}>
-              <Text style={styles.dropdownItemText}>{item}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
 
       {/* Sign Up Button */}
       <TouchableOpacity style={styles.signUpButton} onPress={handleSubmit}>
@@ -121,7 +181,11 @@ const SignUpScreen = ({ navigation }) => {
       {/* Login Link */}
       <Text style={styles.loginText}>
         Already have an account?{' '}
-        <Text style={styles.linkText} onPress={() => navigation.navigate('Login')}>Login</Text>
+        <Text
+          style={styles.linkText}
+          onPress={() => navigation.navigate('Login')}>
+          Login
+        </Text>
       </Text>
     </View>
   );
@@ -140,15 +204,23 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,   
+    marginBottom: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#4F4F4F',
+    marginLeft: 20,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  HeaderTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
     marginBottom: 30,
     textAlign: 'center',
-    marginLeft: 20
+    fontFamily: 'Helvetica',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -159,16 +231,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 2,
     marginBottom: 16,
-  },
-  inputContaine: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 14,
-    marginBottom: 20,
   },
   icon: {
     marginRight: 10,
@@ -181,33 +243,45 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4F4F4F',
   },
-  dropdown: {
-    flex: 1,
+  roleButtonsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
+    marginBottom: 20,
   },
-  dropdownContainer: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+  roleButton: {
+    width: '45%',
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    marginVertical: 4,
+    backgroundColor: '#00BFA6',
+    marginBottom: 15,
+    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
-  dropdownItem: {
-    padding: 10,
+  selectedRole: {
+    backgroundColor: '#00796B',
   },
-  dropdownItemText: {
-    fontSize: 16,
-    color: '#4F4F4F',
+  roleButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  buttonInner: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lottieIcon: {
+    width: 60,
+    height: 60,
   },
   signUpButton: {
     backgroundColor: '#00BFA6',
     borderRadius: 25,
-    paddingVertical: 15,  
+    paddingVertical: 15,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginBottom: 20,
+    marginTop: 20,
   },
   signUpButtonText: {
     color: '#FFFFFF',
@@ -218,6 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4F4F4F',
     textAlign: 'center',
+    marginTop: 20,
   },
   linkText: {
     color: '#00BFA6',

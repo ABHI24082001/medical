@@ -17,6 +17,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import globalStyles from '../component/style';
+import DeleteModal from '../component/DeleteModal';
 
 const TotalDoctor = ({navigation}) => {
   const [doctor, setDoctors] = useState([
@@ -60,6 +61,9 @@ const TotalDoctor = ({navigation}) => {
   const [isEditable, setIsEditable] = useState(false);
   const [role, setRole] = useState('');
   const [experience, setExperience] = useState(null);
+  const [showDelete , setShowDelete] = useState(false);
+  const [isChanging , setIsChanging] = useState(false);
+  const [selectedId, setSelectedId] = useState(null)
 
   const genderOptions = [
     {label: 'Male', value: 'male'},
@@ -194,17 +198,36 @@ const TotalDoctor = ({navigation}) => {
     role: '',
   });
 
-  const toggleSwitch = () => setIsActivated(!isActivated);
+
+  // const handleDeleteUser = id => {
+  //   Alert.alert('Delete User', 'Are you sure you want to delete this user?', [
+  //     {text: 'Cancel'},
+  //     {
+  //       text: 'Delete',
+  //       onPress: () => setDoctors(doctor.filter(user => user.id !== id)),
+  //     },
+  //   ]);
+  // };
+
 
   const handleDeleteUser = id => {
-    Alert.alert('Delete User', 'Are you sure you want to delete this user?', [
-      {text: 'Cancel'},
-      {
-        text: 'Delete',
-        onPress: () => setDoctors(doctor.filter(user => user.id !== id)),
-      },
-    ]);
+    setSelectedId(id);
+    setShowDelete(true);
   };
+
+
+    const handleDelete = () => {
+      if (selectedId !== null) {
+        setIsChanging(true); // Set the loading state
+        setDoctors(prevDoctors =>
+          prevDoctors.filter(user => user.id !== selectedId),
+        );
+        setIsChanging(false); // Reset loading state
+        setShowDelete(false); // Close the modal
+      }
+    };
+
+
 
   const handleSort = type => {
     let sortedUsers = [...doctor];
@@ -273,11 +296,19 @@ const TotalDoctor = ({navigation}) => {
             {item.status === 'Active' ? 'Upcoming' : 'cancel'}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDeleteUser(item.id)}>
           <Text style={styles.deleteButtonText}>Delete</Text>
         </TouchableOpacity>
+
+        <DeleteModal
+          showDelete={showDelete}
+          setShowDelete={setShowDelete}
+          handleDelete={handleDelete}
+          isChanging={isChanging}
+        />
       </View>
     </View>
   );

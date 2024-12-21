@@ -1,153 +1,259 @@
-import React, { useState } from 'react';
 import {
-  View,
+  StyleSheet,
   Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  Modal,
   TextInput,
   TouchableOpacity,
-  FlatList,
-  StyleSheet,
 } from 'react-native';
+import React, {Children, useEffect, useState} from 'react';
+import axios from 'axios';
 
-const ChatBot = () => {
-  const [messages, setMessages] = useState([
-    { id: '1', text: 'Hello! How can I assist you today?', sender: 'bot' },
-  ]);
-  const [inputText, setInputText] = useState('');
+const Book = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newAllYear, setAllYear] = useState('');
+  const [newAllPrice, setAllPrice] = useState('');
+  const [newAllCPU, setAllCPU] = useState('');
+  const [newAllHardDisk, setAllHardDisk] = useState('');
 
-  const sendMessage = () => {
-    if (inputText.trim()) {
-      const newMessage = { id: Date.now().toString(), text: inputText, sender: 'user' };
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-      // Simulate bot response
-      setTimeout(() => {
-        const botReply = { id: Date.now().toString(), text: "I'm here to help!", sender: 'bot' };
-        setMessages((prevMessages) => [...prevMessages, botReply]);
-      }, 1000);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('https://api.restful-api.dev/objects');
+        console.log('API Response:', response.data);
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
 
-      setInputText('');
+
+  const createAddItem = async () => {
+    const newItem = {
+      name: newTitle,
+      data:{
+        year: newAllYear,
+        price: parseFloat(newAllPrice),
+        'CPU model': newAllCPU,
+        'Hard disk size': newAllHardDisk,
+      },
+    };
+    try{
+      const response = await axios.post(
+        'https://api.restful-api.dev/objects',
+        newItem,
+      );
+      console.log('Item added', response?.data);
+      setUsers([...users, response.data]);
+      setIsModalVisible(false);
+    }catch(error){
+      console.log('Error adding item:', error.message);
     }
-  };
 
-  const renderMessage = ({ item }) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.sender === 'user' ? styles.userMessage : styles.botMessage,
-      ]}
-    >
-      <Text style={styles.messageText}>{item.text}</Text>
-    </View>
-  );
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#00BFA6" />
+        <Text>Loading users...</Text>
+      </View>
+    );
+  }
+
+
+  // reverse String
+
+  function reverseString(str){
+    return str.split('').reverse().join('');
+  }
+
+  function reverseSting(str){
+    return str.split('').reverse().join('');
+  }
+
+
+  function factorial(n){
+    if (n === 0 || n ===1) return 1;
+    return n * factorial(n-1);
+  }
+
+  console.log(factorial(5));
+
+
+
+
+
+
+
+
+  
+
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Health{' '}chat{' '}Bot</Text>
-      </View>
+      <Text style={styles.title}>User List</Text>
 
-      {/* Chat Messages */}
       <FlatList
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        style={styles.chatList}
-        inverted
+        data={users}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({item}) => (
+          <View style={styles.userContainer}>
+            <Text style={styles.userText}>ID: {item.id}</Text>
+            <Text style={styles.userText}>Username: {item.username}</Text>
+            <Text style={styles.userText}>Name: {item.name}</Text>        
+          </View>
+        )}
       />
 
-      {/* Input Area */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Button to open modal */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setIsModalVisible(true)}>
+        <Text style={styles.buttonText}>Add New Item</Text>
+      </TouchableOpacity>
+
+      {/* Modal to add new item */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Add New Item</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor={'#000'}
+            value={newTitle}
+            onChangeText={setNewTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Year"
+            placeholderTextColor={'#000'}
+            value={newAllYear}
+            onChangeText={setAllYear}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Price"
+            placeholderTextColor={'#000'}
+            value={newAllPrice}
+            onChangeText={setAllPrice}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="CPU Model"
+            placeholderTextColor={'#000'}
+            value={newAllCPU}
+            onChangeText={setAllCPU}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Hard Disk Size"
+            placeholderTextColor={'#000'}
+            value={newAllHardDisk}
+            onChangeText={setAllHardDisk}
+          />
+
+          <TouchableOpacity style={styles.submitButton} onPress={createAddItem}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => setIsModalVisible(false)}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
 
+export default Book;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f7f1',
+    backgroundColor: '#FFFFFF',
+    padding: 20,
   },
-  header: {
-    backgroundColor: '#2e7d32',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  headerText: {
-    color: '#fff',
+  title: {
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  chatList: {
-    flex: 1,
-    paddingHorizontal: 10,
+    color: '#333',
     marginBottom: 10,
+    textAlign: 'center',
   },
-  messageContainer: {
-    maxWidth: '75%',
-    marginVertical: 5,
-    padding: 10,
+  userContainer: {
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: '#F5F5F5',
     borderRadius: 10,
   },
-  userMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#66bb6a',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-  },
-  botMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#a5d6a7',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-  },
-  messageText: {
+  userText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#333',
   },
-  inputContainer: {
-    flexDirection: 'row',
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
+  },
+  button: {
+    padding: 10,
+    backgroundColor: '#00BFA6',
+    borderRadius: 5,
+    marginVertical: 20,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   input: {
-    flex: 1,
-    backgroundColor: '#f4f4f4',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1,
+    height: 40,
     borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingLeft: 10,
+    borderRadius: 5,
+    color: '#000',
   },
-  sendButton: {
-    marginLeft: 10,
-    backgroundColor: '#2e7d32',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+  submitButton: {
+    padding: 10,
+    backgroundColor: '#00BFA6',
+    borderRadius: 5,
+    marginBottom: 10,
   },
-  sendButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  cancelButton: {
+    padding: 10,
+    backgroundColor: '#FF6347',
+    borderRadius: 5,
   },
 });
-
-export default ChatBot;

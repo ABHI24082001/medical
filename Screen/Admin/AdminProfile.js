@@ -10,9 +10,8 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
-import Octicons from 'react-native-vector-icons/Octicons';
-import globalStyles from '../component/style';
-import GradientButton from '../component/GradientButton';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+
 
 const AdminProfileScreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -105,12 +104,7 @@ const AdminProfileScreen = ({navigation}) => {
               Are you sure you want to log out?
             </Text>
             <TouchableOpacity>
-              <Image
-                source={{
-                  uri: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Outdoors-man-portrait_%28cropped%29.jpg',
-                }}
-                style={styles.profileImage}
-              />
+               <SimpleLineIcons name="logout" size={50} color="#00ad00" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.logoutButton}

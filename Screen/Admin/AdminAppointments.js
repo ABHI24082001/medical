@@ -15,6 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Dropdown} from 'react-native-element-dropdown';
 import LinearGradient from 'react-native-linear-gradient';
 import globalStyles from '../component/style';
+import DeleteModal from '../component/DeleteModal';
 
 const AdminAppointments = ({navigation}) => {
   const [appointments, setAppointments] = useState([
@@ -55,6 +56,9 @@ const AdminAppointments = ({navigation}) => {
 
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
+  const [showDelete , setShowDelete] = useState(false);
+  const [isChanging , setIsChanging] = useState(false);
+  const [selectedId , setSelectedId] = useState(null);
 
   // Dropdown data
   const filterOptions = [
@@ -79,23 +83,45 @@ const AdminAppointments = ({navigation}) => {
   );
 
   // Handle Delete
-  const handleDelete = id => {
-    Alert.alert(
-      'Confirm Delete',
-      'Are you sure you want to delete this appointment?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () =>
-            setAppointments(appointments.filter(item => item.id !== id)),
-        },
-      ],
-    );
+  // const handleDelete = id => {
+  //   Alert.alert(
+  //     'Confirm Delete',
+  //     'Are you sure you want to delete this appointment?',
+  //     [
+  //       {
+  //         text: 'Cancel',
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'Delete',
+  //         onPress: () =>
+  //           setAppointments(appointments.filter(item => item.id !== id)),
+  //       },
+  //     ],
+  //   );
+  // };
+
+  const handleDeleteUser = id => {
+    setSelectedId(id);
+    setShowDelete(true);
+  }
+
+
+  const handleDelete = () => {
+    if (selectedId !== null) {
+      setIsChanging(true); // Set the loading state
+      setAppointments(prevDoctors =>
+        prevDoctors.filter(user => user.id !== selectedId),
+      );
+      setIsChanging(false); // Reset loading state
+      setShowDelete(false); // Close the modal
+    }
   };
+  
+
+  
+
+
 
   // Handle Edit (Placeholder)
   const handleEdit = appointment => {
@@ -206,7 +232,7 @@ const AdminAppointments = ({navigation}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={() => handleDelete(appointment.id)}>
+                onPress={() => handleDeleteUser(appointment.id)}>
                 <Text style={styles.deleteButtonText}>Delete</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -215,6 +241,13 @@ const AdminAppointments = ({navigation}) => {
                 <Text style={styles.detailsButtonText}>Details</Text>
               </TouchableOpacity>
             </View>
+
+            <DeleteModal
+              showDelete={showDelete}
+              setShowDelete={setShowDelete}
+              handleDelete={handleDelete}
+              isChanging={isChanging}
+            />
           </View>
         ))}
       </ScrollView>

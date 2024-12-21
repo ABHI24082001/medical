@@ -10,6 +10,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import SuccessMessage from './component/sucess';
+import LottieView from 'lottie-react-native';
+import Login from '../Screen/LottiView/Login.json'
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -109,6 +111,15 @@ const LoginScreen = ({navigation}) => {
             <Text style={styles.title}>Login</Text>
           </View>
 
+          <View style={styles.centerContainer}>
+            <LottieView
+              source={Login}
+              autoPlay
+              loop={true}
+              style={styles.lottieView}
+            />
+          </View>
+
           {/* Email Input */}
           <View style={styles.inputContainer}>
             <Icon
@@ -161,7 +172,8 @@ const LoginScreen = ({navigation}) => {
           ) : null}
 
           {/* Forgot Password */}
-          <TouchableOpacity onPress={() => navigation.navigate('ForgetPassword')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgetPassword')}>
             <Text style={styles.forgotPassword}>Forgot password?</Text>
           </TouchableOpacity>
 
@@ -185,40 +197,21 @@ const LoginScreen = ({navigation}) => {
             <View style={styles.divider} />
           </View>
 
-          {/* Social Buttons */}
-          <TouchableOpacity style={styles.socialButton}  onPress={() => navigation.navigate('Dashboard')}>
-            <FontAwesomeIcon
-              name="google"
-              size={20}
-              color="#4285F4"
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign in with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialButton}>
-            <FontAwesomeIcon
-              name="facebook"
-              size={20}
-              color="#3b5998"
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign in with Facebook</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.socialButton}
-            onPress={() => navigation.navigate('LoginPhone')}>
-            <Icon
-              name="phone"
-              size={20}
-              color="#34c759"
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>
-              Sign in with Phone Number
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.socialRow}>
+            <TouchableOpacity
+              style={styles.roundedIcon}
+              onPress={() => navigation.navigate('Dashboard')}>
+              <FontAwesomeIcon name="google" size={30} color="#4285F4" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.roundedIcon}>
+              <FontAwesomeIcon name="facebook" size={30} color="#3b5998" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.roundedIcon}
+              onPress={() => navigation.navigate('LoginPhone')}>
+              <Icon name="phone" size={30} color="#34c759" />
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </View>
@@ -229,6 +222,29 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     backgroundColor: '#FFFFFF',
+  },
+
+  centerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lottieView: {
+    width: 300,
+    height: 300,
+  },
+  roundedIcon: {
+    width: 70,
+    height: 70,
+    borderRadius: 25,
+   
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginVertical: 10,
   },
   headerRow: {
     flexDirection: 'row',
@@ -308,15 +324,13 @@ const styles = StyleSheet.create({
     color: '#A9A9A9',
     fontSize: 14,
   },
-  socialButton: {
-    flexDirection: 'row',
+  roundedIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    marginBottom: 10,
   },
   socialIcon: {
     marginRight: 10,

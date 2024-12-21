@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState , useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,18 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {Dropdown} from 'react-native-element-dropdown';
 import globalStyles from '../component/style';
+import LoadingModal from '../component/LoadingModal';
+
 
 const App = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedTreatment, setSelectedTreatment] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const treatments = [
     {label: 'CTVS', value: 'CTVS'},
@@ -125,7 +127,6 @@ const App = ({navigation}) => {
       type: 'Clinic',
       rating: 4.9,
       reviews: 58,
-
       imageUri:
         'https://as1.ftcdn.net/v2/jpg/02/11/15/66/1000_F_211156620_CeBr5etdTNXLb231sFcQ8M9YD1OY5IW8.jpg',
     },
@@ -140,6 +141,12 @@ const App = ({navigation}) => {
           .includes(searchQuery.toLowerCase())) &&
       (!selectedTreatment || hospital.treatments.includes(selectedTreatment)),
   );
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); // Set loading to false after a delay
+    }, 2000); // Set your desired delay time here (e.g., 2 seconds)
+  }, []); // Only run on mount
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -206,50 +213,55 @@ const App = ({navigation}) => {
 
       {/* Section Title */}
       <Text style={styles.sectionTitle}>All Hospitals</Text>
-
-      <View style={styles.hospitalContainer}>
-        {filteredHospitals.map(hospital => (
-          <TouchableOpacity
-            key={hospital.id}
-            onPress={() => navigation.navigate('DoctorDetails', {hospital})}
-            style={styles.cardContainer}>
-            <Image
-              source={{uri: hospital.imageUri}}
-              style={styles.hospitalImage}
-              resizeMode="cover"
-            />
-            <View style={styles.cardContent}>
-              <Text
-                style={globalStyles.textBold2}
-                numberOfLines={1}
-                ellipsizeMode="tail">
-                {hospital.name}
-              </Text>
-              <Text
-                style={globalStyles.textMedium}
-                numberOfLines={2}
-                ellipsizeMode="tail">
-                {hospital.details.address}
-              </Text>
-              <Text
-                style={globalStyles.textMedium}
-                numberOfLines={1}
-                ellipsizeMode="tail">
-                {hospital.distance}
-              </Text>
-
+      {loading && <LoadingModal />}   
+      {!loading && (
+        <>
+          <View style={styles.hospitalContainer}>
+            {/* {setLoading} <LoadingModal /> */}
+            {filteredHospitals.map(hospital => (
               <TouchableOpacity
-                style={styles.detailsButton}
                 key={hospital.id}
-                onPress={() =>
-                  navigation.navigate('DoctorDetails', {hospital})
-                }>
-                <Text style={styles.detailsButtonText}>View Details</Text>
+                onPress={() => navigation.navigate('DoctorDetails', {hospital})}
+                style={styles.cardContainer}>
+                <Image
+                  source={{uri: hospital.imageUri}}
+                  style={styles.hospitalImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.cardContent}>
+                  <Text
+                    style={globalStyles.textBold2}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {hospital.name}
+                  </Text>
+                  <Text
+                    style={globalStyles.textMedium}
+                    numberOfLines={2}
+                    ellipsizeMode="tail">
+                    {hospital.details.address}
+                  </Text>
+                  <Text
+                    style={globalStyles.textMedium}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {hospital.distance}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.detailsButton}
+                    key={hospital.id}
+                    onPress={() =>
+                      navigation.navigate('DoctorDetails', {hospital})
+                    }>
+                    <Text style={styles.detailsButtonText}>View Details</Text>
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
+            ))}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 };

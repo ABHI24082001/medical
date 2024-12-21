@@ -8,8 +8,6 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-
 const MountainDetailsScreen = ({navigation, route}) => {
   const {hospital} = route.params;
 

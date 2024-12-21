@@ -25,11 +25,13 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   const handleResetPassword = () => {
     if (validateEmail(email)) {
-      // Perform password reset logic here
       alert('Password reset link sent to your email!');
-      navigation.goBack(); // Navigate back after success
+      navigation.goBack();
     }
   };
+
+
+ 
 
   return (
     <View style={styles.container}>

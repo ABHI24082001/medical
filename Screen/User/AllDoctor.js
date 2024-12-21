@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,12 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {Dropdown} from 'react-native-element-dropdown';
 import globalStyles from '../component/style';
+import LoadingModal from '../component/LoadingModal';
 
 const AllDoctor = ({navigation}) => {
   const [selectedTreatment, setSelectedTreatment] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading , setLoading] =  useState('true');
 
   const doctors = [
     {
@@ -132,6 +134,12 @@ const AllDoctor = ({navigation}) => {
     );
   }, [selectedTreatment, searchQuery, doctors]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000)
+  }, []);
+
   const renderDoctorCard = ({item}) => (
     <TouchableOpacity
       style={styles.cardContainer}
@@ -196,13 +204,19 @@ const AllDoctor = ({navigation}) => {
         </View>
       </LinearGradient>
 
-      <FlatList
-        data={filteredDoctors}
-        renderItem={renderDoctorCard}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.doctorList}
-        numColumns={2}
-      />
+      {loading && <LoadingModal />}
+
+      {!loading && (
+        <>
+          <FlatList
+            data={filteredDoctors}
+            renderItem={renderDoctorCard}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.doctorList}
+            numColumns={2}
+          />
+        </>
+      )}
     </View>
   );
 };
